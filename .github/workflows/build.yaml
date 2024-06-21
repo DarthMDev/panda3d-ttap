@@ -163,7 +163,12 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          brew install assimp eigen harfbuzz jpeg libpng ode openssl pkg-config libsquish
+          brew install assimp eigen harfbuzz jpeg libpng ode openssl pkg-config libsquish wget
+          # download thirdparty packages from https://www.panda3d.org/download/panda3d-1.10.14/panda3d-1.10.14-tools-mac.tar.gz
+          # then copy the extracted thirdparty folder to root dir
+          wget https://www.panda3d.org/download/panda3d-1.10.14/panda3d-1.10.14-tools-mac.tar.gz
+          tar -xvf panda3d-1.10.14-tools-mac.tar.gz 
+          mv panda3d-1.10.14/thirdparty .
 
       - name: Build Panda
         run: |
