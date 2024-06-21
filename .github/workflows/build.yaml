@@ -203,7 +203,6 @@ jobs:
             --use-toontown \
             --python-incdir="$pythonLocation/include" \
             --python-libdir="$pythonLocation/lib"
-            --osxtarget=11.0
             
 
       - name: Upload Panda Binary
