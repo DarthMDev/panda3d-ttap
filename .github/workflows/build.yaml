@@ -163,7 +163,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          brew install assimp eigen harfbuzz jpeg libpng ode openssl pkg-config squish
+          brew install assimp eigen harfbuzz jpeg libpng ode openssl pkg-config libsquish
 
       - name: Build Panda
         run: |
