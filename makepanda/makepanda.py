@@ -2518,6 +2518,8 @@ def WriteConfigSettings():
         # check for system architecture arm64
         if os.uname().machine == 'arm64':
             dtool_config["USE_DELETED_CHAIN"] = '1'
+        else:
+            dtool_config["USE_DELETED_CHAIN"] = 'UNDEF'
     else:
         # On other systems, the default malloc seems to be fine.
         dtool_config["USE_DELETED_CHAIN"] = 'UNDEF'
