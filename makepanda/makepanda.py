@@ -2513,6 +2513,11 @@ def WriteConfigSettings():
             # If we don't have mimalloc, use DeletedBufferChain as fallback,
             # which is still more efficient than malloc.
             dtool_config["USE_DELETED_CHAIN"] = '1'
+    # this will resolve a crash on apple silicon systems
+    elif GetTarget() == 'darwin':
+        # check for system architecture arm64
+        if os.uname().machine == 'arm64':
+            dtool_config["USE_DELETED_CHAIN"] = '1'
     else:
         # On other systems, the default malloc seems to be fine.
         dtool_config["USE_DELETED_CHAIN"] = 'UNDEF'
