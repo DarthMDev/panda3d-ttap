@@ -78,7 +78,7 @@ PLATFORM = None
 COPY_PYTHON = True
 
 PkgListSet(["PYTHON", "DIRECT",                        # Python support
-  "GL", "VULKAN"] + DXVERSIONS + ["TINYDISPLAY",       # 3D graphics
+  "GL", "VULKAN", "METAL", "GLSLANG", "SPIRV-TOOLS", "SPIRV-CROSS-GLSL", "SPIRV-CROSS-HLSL"] + DXVERSIONS + ["TINYDISPLAY",       # 3D graphics
   "EGL", "GLES", "GLES2",                              # OpenGL (ES) integration
   "EIGEN",                                             # Linear algebra acceleration
   "OPENAL", "FMODEX",                                  # Audio playback
@@ -863,6 +863,8 @@ if (COMPILER=="GCC"):
     #if not PkgSkip("PYTHON"):
     #    IncDirectory("PYTHON", SDK["PYTHON"])
     if (GetHost() == "darwin"):
+        IncDirectory("ALWAYS", "/opt/homebrew/include")
+        LibDirectory("ALWAYS", "/opt/homebrew/lib")
         if (PkgSkip("FREETYPE")==0 and not os.path.isdir(GetThirdpartyDir() + 'freetype')):
             IncDirectory("FREETYPE", "/usr/X11/include")
             IncDirectory("FREETYPE", "/usr/X11/include/freetype2")
@@ -1140,6 +1142,7 @@ if (COMPILER=="GCC"):
         LibName("QUARTZ", "-framework Quartz")
         LibName("CARBON", "-framework Carbon")
         LibName("COCOA", "-framework Cocoa")
+        LibName("METAL", "-framework Metal -framework MetalKit -framework QuartzCore")
         # Fix for a bug in OSX Leopard:
         LibName("GL", "-dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib")
         # When using pre-11.0 SDKs, for PStats
@@ -2520,6 +2523,7 @@ DTOOL_CONFIG=[
     ("HAVE_DIRECTCAM",                 'UNDEF',                  'UNDEF'),
     ("HAVE_SQUISH",                    'UNDEF',                  'UNDEF'),
     ("HAVE_COCOA",                     'UNDEF',                  'UNDEF'),
+    ("HAVE_METAL",                     'UNDEF',                  'UNDEF'),
     ("HAVE_OPENAL_FRAMEWORK",          'UNDEF',                  'UNDEF'),
     ("USE_TAU",                        'UNDEF',                  'UNDEF'),
     ("PRC_SAVE_DESCRIPTIONS",          '1',                      '1'),
@@ -3401,6 +3405,8 @@ elif GetTarget() == 'darwin':
     CopyAllHeaders('panda/src/cocoadisplay')
     if not PkgSkip('GL'):
         CopyAllHeaders('panda/src/cocoagldisplay')
+    if not PkgSkip('METAL'):
+        CopyAllHeaders('panda/src/metaldisplay')
 elif GetTarget() == 'android':
     CopyAllHeaders('panda/src/android')
     CopyAllHeaders('panda/src/androiddisplay')
@@ -4832,6 +4838,18 @@ if not PkgSkip("VULKAN"):
     TargetAdd('libp3vulkandisplay.dll', input='p3x11display_composite1.obj')
     TargetAdd('libp3vulkandisplay.dll', opts=['MODULE', 'VULKAN', 'X11', 'XRANDR', 'XF86DGA', 'XCURSOR'])
   TargetAdd('libp3vulkandisplay.dll', input=COMMON_PANDA_LIBS)
+
+#
+# DIRECTORY: panda/src/metaldisplay/
+#
+
+if GetTarget() == 'darwin' and not PkgSkip("METAL"):
+  OPTS=['DIR:panda/src/metaldisplay', 'BUILDING:METALDISPLAY', 'METAL']
+  TargetAdd('p3metaldisplay_composite1.obj', opts=OPTS, input='p3metaldisplay_composite1.mm')
+  TargetAdd('libp3metaldisplay.dll', input='p3metaldisplay_composite1.obj')
+  TargetAdd('libp3metaldisplay.dll', input='p3cocoadisplay_composite1.obj')
+  TargetAdd('libp3metaldisplay.dll', input=COMMON_PANDA_LIBS)
+  TargetAdd('libp3metaldisplay.dll', opts=['MODULE', 'METAL', 'CARBON', 'QUARTZ'])
 
 #
 # DIRECTORY: panda/src/webgldisplay/
