@@ -84,8 +84,15 @@
 #define _close close //--vluzacn
 #define _unlink unlink //--vluzacn
 
+// macOS/arm64 port: interrogate's CPPPARSER can't parse __attribute__ in these positions,
+// so make them benign during interrogation. # -- macOS port
+#ifdef CPPPARSER
+#define FORCEINLINE inline
+#define FORMAT_PRINTF(STRING_INDEX,FIRST_TO_CHECK)
+#else
 #define FORCEINLINE __inline__ __attribute__((always_inline))  //--vluzacn
 #define FORMAT_PRINTF(STRING_INDEX,FIRST_TO_CHECK) __attribute__((format (printf, STRING_INDEX, FIRST_TO_CHECK))) //--vluzacn
+#endif
 
 #endif
 /////////////////////////////

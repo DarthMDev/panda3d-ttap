@@ -18,8 +18,12 @@
 #include <aa_luse.h>
 
 // macOS/arm64 port: 16-byte alignment macros. MSVC uses the __declspec prefix; clang/gcc
-// use the __attribute__ postfix. # -- macOS port
-#if defined(_MSC_VER)
+// use the __attribute__ postfix. interrogate's CPPPARSER can't parse either, so make them
+// empty during interrogation. # -- macOS port
+#if defined(CPPPARSER)
+#define ALIGN16
+#define ALIGN16_POST
+#elif defined(_MSC_VER)
 #define ALIGN16 __declspec(align(16))
 #define ALIGN16_POST
 #else
