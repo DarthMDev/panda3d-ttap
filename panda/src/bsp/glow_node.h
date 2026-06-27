@@ -20,7 +20,7 @@
 #include <geom.h>
 #include <renderState.h>
 
-extern ConfigVariableDouble r_glow_querysize;
+extern EXPCL_PANDABSP ConfigVariableDouble r_glow_querysize;
 
 class GlowNode;
 

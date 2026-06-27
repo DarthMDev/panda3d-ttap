@@ -34,6 +34,8 @@ Documentation for C++ subprocessing libraray.
 #ifndef SUBPROCESS_HPP
 #define SUBPROCESS_HPP
 
+#ifndef CPPPARSER
+
 #include <map>
 #include <algorithm>
 #include <iostream>
@@ -2237,5 +2239,7 @@ namespace subprocess
 	}
 
 }
+
+#endif // CPPPARSER
 
 #endif // SUBPROCESS_HPP

@@ -9,6 +9,8 @@
  * @date July 22, 2019
  */
 
+#pragma once
+
 #include "postprocess/postprocess_pass.h"
 #include "postprocess/postprocess_effect.h"
 
@@ -19,7 +21,9 @@
 #include <pta_float.h>
 #include <configVariableBool.h>
 
+#ifndef CPPPARSER
 extern ConfigVariableBool hdr_auto_exposure;
+#endif
 
 struct hdrbucket_t
 {

@@ -154,7 +154,9 @@ enum
 	HEADER_LUMPS,
 };
 
-typedef struct
+// macOS/arm64 port: named struct tag so bsploader.h's `struct dmodel_t;` forward decl is
+// compatible (interrogate rejects struct-tag vs anonymous-typedef-name clash). # -- macOS port
+typedef struct dmodel_t
 {
         float           mins[3], maxs[3];
         float           origin[3];

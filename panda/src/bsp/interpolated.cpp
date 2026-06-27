@@ -15,8 +15,7 @@
 
 static ConfigVariableDouble interp_amount( "smooth-lag", 0.1 );
 
-template <typename Type>
-void CInterpolatedGroup::add_var( Type *data, IInterpolatedVar *watcher, int type )
+void CInterpolatedGroup::add_var( void *data, IInterpolatedVar *watcher, int type )
 {
 	// Only add it if it hasn't been added yet.
 	bool bAddIt = true;
@@ -46,7 +45,7 @@ void CInterpolatedGroup::add_var( Type *data, IInterpolatedVar *watcher, int typ
 		nassertv( watcher->GetDebugName() != NULL );
 
 		VarMapEntry_t map;
-		map.data = (void *)data;
+		map.data = data;
 		map.watcher = watcher;
 		map.type = type;
 		map.m_bNeedsToInterpolate = true;
@@ -61,12 +60,11 @@ void CInterpolatedGroup::add_var( Type *data, IInterpolatedVar *watcher, int typ
 		}
 	}
 
-	watcher->_Setup( (void *)data, type );
+	watcher->_Setup( data, type );
 	watcher->SetInterpolationAmount( interp_amount );
 }
 
-template <typename Type>
-void CInterpolatedGroup::remove_var( Type *data, bool assert )
+void CInterpolatedGroup::remove_var( void *data, bool assert )
 {
 	for ( size_t i = 0; i < _var_map.m_Entries.size(); i++ )
 	{

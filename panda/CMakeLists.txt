@@ -194,7 +194,16 @@ bdist_apps = direct.dist.commands:bdist_apps
     # LINK pandabsp so the module links the (exported) pandabsp lib rather than the raw
     # p3bspinternal component; p3bspinternal is still interrogated, and its BSPMaterial
     # symbols come from libpanda (panda3d.core) at runtime. # -- macOS port
+    list(APPEND IGATE_FLAGS "-noangles")
     add_python_module(panda3d.bsp p3bspinternal pandabsp LINK pandabsp IMPORT panda3d.core IMPORT panda3d.bullet) # -- lachbr
+    if(APPLE)
+      target_link_options(panda3d.bsp PRIVATE -undefined dynamic_lookup)
+    endif()
+    target_sources(panda3d.bsp PRIVATE
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/bsp/py_bsploader.cpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/bsp/physics_character_controller.cpp"
+    )
+    target_link_libraries(panda3d.bsp $<TARGET_FILE:p3bspbase>)
   endif()
 
   if(HAVE_ODE)

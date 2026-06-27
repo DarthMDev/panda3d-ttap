@@ -11,9 +11,10 @@
 #include "mathlib.h"
 #ifndef CPPPARSER
 #include "lerp_functions.h"
-#else
-typedef uint8_t byte;
 #endif
+// macOS/arm64 port: dropped the interrogate-only `typedef uint8_t byte;` here — it
+// conflicted with bspbase mathtypes.h's `typedef unsigned char byte;` and crashed
+// interrogate. byte already comes from mathlib.h above. # -- macOS port
 
 #define COMPARE_HISTORY( a, b )                                           \
 	( memcmp( m_VarHistory[a].GetValue(), m_VarHistory[b].GetValue(), \
@@ -1244,7 +1245,7 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::Copy(
 	IInterpolatedVar *pInSrc )
 {
 	CInterpolatedVarArrayBase<Type, IS_ARRAY> *pSrc =
-		dynamic_cast<CInterpolatedVarArrayBase<Type, IS_ARRAY> *>( pInSrc );
+		static_cast<CInterpolatedVarArrayBase<Type, IS_ARRAY> *>( pInSrc );
 
 	if ( !pSrc || pSrc->m_nMaxCount != m_nMaxCount )
 	{

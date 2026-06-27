@@ -12,6 +12,8 @@
  */
 
 #include "bsp_trace.h"
+
+#ifndef CPPPARSER
 #include "bsploader.h"
 
 #include <pstatTimer.h>
@@ -814,3 +816,5 @@ void BSPTrace::clear()
 	_dface_map.clear();
 	_geom_handles.clear();
 }
+
+#endif

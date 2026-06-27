@@ -79,10 +79,8 @@ set(PANDABSP_SOURCES
   interpolatedvar.cpp
   lighting_origin_effect.cpp
   lightmap_palettes.cpp
-  physics_character_controller.cpp
   planar_reflections.cpp
   pssmCameraRig.cpp
-  py_bsploader.cpp
   rangecheckedvar.cpp
   raytrace.cpp
   shader_csmrender.cpp
@@ -114,16 +112,20 @@ set(PANDABSP_SOURCES
 composite_sources(pandabsp PANDABSP_SOURCES)
 add_library(pandabsp ${PANDABSP_SOURCES} ${PANDABSP_HEADERS})
 set_target_properties(pandabsp PROPERTIES DEFINE_SYMBOL BUILDING_LIBPANDABSP)
+# macOS port: enable the python-aware BSP loaders (Py_CL_BSPLoader/Py_AI_BSPLoader, guarded
+# by _PYTHON_VERSION) that the game imports. # -- macOS port
+target_compile_definitions(pandabsp PUBLIC _PYTHON_VERSION)
 
 # macOS port: the renderer uses bspbase (bspfile/mathlib/winding) and embree, which the
 # original makepanda build linked implicitly. Wire them explicitly here. # -- macOS port
-target_include_directories(pandabsp PRIVATE
-  "${CMAKE_CURRENT_SOURCE_DIR}/../bspbase"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../bspbase/mathlib"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../bullet"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../glgsg"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../glstuff"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../bspinternal"
+target_include_directories(pandabsp PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../bspbase>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../bspbase/mathlib>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../bullet>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../glgsg>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../glstuff>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../bspinternal>
+  PRIVATE
   ${PYTHON_INCLUDE_DIRS})  # py_panda.h -> Python.h, bspinternal headers # -- macOS port
 find_package(embree 4 QUIET)
 # macOS port: pandagl/pandabullet are MODULE (loadable) libs and can't be linked; the bsp
@@ -137,13 +139,16 @@ else()
   target_include_directories(pandabsp PRIVATE /opt/homebrew/opt/embree/include)
   set(_BSP_EMBREE ${EMBREE_LIB})
 endif()
-target_link_libraries(pandabsp PUBLIC panda pandaegg PRIVATE PKG::BULLET p3bspbase ${_BSP_EMBREE})
+target_link_libraries(pandabsp PUBLIC panda pandaegg p3bullet PKG::BULLET PRIVATE p3bspbase ${_BSP_EMBREE})
+target_compile_definitions(pandabsp PUBLIC VERSION_OTHER POSIX)
 # Python C-API and cross-module panda/interrogate symbols resolve at runtime when this is
 # loaded as the panda3d.bsp python module. # -- macOS port
 if(APPLE)
   target_link_options(pandabsp PRIVATE -undefined dynamic_lookup)
 endif()
-target_interrogate(pandabsp ALL)
+set(PANDABSP_IGATE_HEADERS ${PANDABSP_HEADERS})
+list(REMOVE_ITEM PANDABSP_IGATE_HEADERS subprocess.h)
+target_interrogate(pandabsp ${PANDABSP_IGATE_HEADERS})
 
 install(TARGETS pandabsp
   EXPORT PandaBSP COMPONENT PandaBSP

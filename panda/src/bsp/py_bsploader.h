@@ -21,7 +21,7 @@
 #include <py_panda.h>
 #include "entity.h"
 
-class Py_BSPLoader : public BSPLoader
+class EXPCL_PANDABSP Py_BSPLoader : public BSPLoader
 {
 PUBLISHED:
 	PyObject *find_all_entities( const string &classname );
@@ -44,7 +44,7 @@ protected:
 	pvector<entitydef_t> _entities;
 };
 
-class Py_CL_BSPLoader : public Py_BSPLoader
+class EXPCL_PANDABSP Py_CL_BSPLoader : public Py_BSPLoader
 {
 PUBLISHED:
 	Py_CL_BSPLoader();
@@ -64,7 +64,7 @@ private:
 	pmap<string, PyTypeObject *> _entity_to_class;
 };
 
-class Py_AI_BSPLoader : public Py_BSPLoader
+class EXPCL_PANDABSP Py_AI_BSPLoader : public Py_BSPLoader
 {
 PUBLISHED:
 	Py_AI_BSPLoader();

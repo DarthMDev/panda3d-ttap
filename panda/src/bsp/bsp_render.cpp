@@ -34,8 +34,10 @@ static PStatCollector findgeomshader_collector( "Cull:BSP:FindGeomShader" );
 static PStatCollector applyshaderattrib_collector( "Cull:BSP:ApplyShaderAttrib" );
 static PStatCollector makecullable_geomnode_collector( "Cull:BSP:AddForDraw:MakeCullableObject" );
 
+#ifndef CPPPARSER
 static ConfigVariableColor dynamic_wf_color( "bsp-dynamic-wireframe-color", LColor( 0, 1.0, 1.0, 1.0 ) );
 static ConfigVariableColor brush_wf_color( "bsp-brush-wireframe-color", LColor( 231 / 255.0, 129 / 255.0, 129 / 255.0, 1.0 ) );
+#endif
 
 IMPLEMENT_CLASS( BSPCullTraverser );
 

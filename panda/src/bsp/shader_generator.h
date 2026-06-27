@@ -26,6 +26,7 @@
 class PSSMCameraRig;
 class GraphicsStateGuardian;
 
+#ifndef CPPPARSER
 extern ConfigVariableInt pssm_splits;
 extern ConfigVariableInt pssm_size;
 extern ConfigVariableBool want_pssm;
@@ -36,6 +37,7 @@ extern ConfigVariableBool normal_offset_uv_space;
 extern ConfigVariableColor ambient_light_identifier;
 extern ConfigVariableColor ambient_light_min;
 extern ConfigVariableDouble ambient_light_scale;
+#endif
 
 NotifyCategoryDeclNoExport(bspShaderGenerator);
 

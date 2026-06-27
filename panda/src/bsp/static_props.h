@@ -14,7 +14,7 @@
 
 #include "config_bsp.h"
 
-class EXPCL_PANDABSP StaticPropAttrib : RenderAttrib
+class EXPCL_PANDABSP StaticPropAttrib : public RenderAttrib
 {
 	DECLARE_ATTRIB( StaticPropAttrib, RenderAttrib );
 

@@ -51,14 +51,14 @@ PUBLISHED:
 	void set_interpolation_enabled( bool enable );
 	bool interpolation_enabled() const;
 
+public:
 	//
 	// Add/remove var mappings for interpolation.
 	//
-	template <typename Type>
-	void add_var( Type *data, IInterpolatedVar *watcher, int type );
-	template <typename Type>
-	void remove_var( Type *data, bool assert = true );
+	void add_var( void *data, IInterpolatedVar *watcher, int type );
+	void remove_var( void *data, bool assert = true );
 
+PUBLISHED:
 	void add_float( float *data, IInterpolatedVar *watcher, int type );
 	void add_vec2( LVector2f *data, IInterpolatedVar *watcher, int type );
 	void add_vec3( LVector3f *data, IInterpolatedVar *watcher, int type );

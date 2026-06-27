@@ -99,16 +99,7 @@ void GlowNode::draw_callback( CallbackData *data )
 {
 	if ( _ctx )
 	{
-		if ( _ctx->is_of_type( CLP( OcclusionQueryContext )::get_class_type() ) )
-		{
-			CLP( OcclusionQueryContext ) *glctx = DCAST( CLP( OcclusionQueryContext ), _ctx );
-			if ( glctx->is_answer_ready() )
-			{
-				_occlusion_query_pixels = glctx->get_num_fragments();
-				_ctx = nullptr;
-			}
-		}
-		else
+		if ( _ctx->is_answer_ready() )
 		{
 			_occlusion_query_pixels = _ctx->get_num_fragments();
 			_ctx = nullptr;

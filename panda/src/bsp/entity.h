@@ -29,11 +29,12 @@ class BSPLoader;
 class CBaseEntity;
 
 #ifdef CPPPARSER
-class entity_t;
-class dmodel_t;
+struct entity_s;
+typedef entity_s entity_t;
+struct dmodel_t;
 #endif
 
-struct entitydef_t
+struct EXPCL_PANDABSP entitydef_t
 {
 	PT( CBaseEntity ) c_entity;
 	PyObject *py_entity;

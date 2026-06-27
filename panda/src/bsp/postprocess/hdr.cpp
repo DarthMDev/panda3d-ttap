@@ -269,23 +269,14 @@ void HDRPass::draw( CallbackData *data )
 
 	if ( bucket->ctx )
 	{
-		if ( bucket->ctx->is_of_type( CLP( OcclusionQueryContext )::get_class_type() ) )
-		{
-			CLP( OcclusionQueryContext ) *glctx = DCAST( CLP( OcclusionQueryContext ), bucket->ctx );
-			if ( glctx->is_answer_ready() )
-			{
-				bucket->pixels = glctx->get_num_fragments();
-				bucket->ctx = nullptr;
-			}
-			else
-			{
-				return;
-			}
-		}
-		else
+		if ( bucket->ctx->is_answer_ready() )
 		{
 			bucket->pixels = bucket->ctx->get_num_fragments();
 			bucket->ctx = nullptr;
+		}
+		else
+		{
+			return;
 		}
 	}
 

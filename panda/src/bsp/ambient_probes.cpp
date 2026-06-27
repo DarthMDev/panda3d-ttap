@@ -902,6 +902,13 @@ T AmbientProbeManager::find_closest_in_kdtree( KDTree *tree, const LPoint3 &pos,
         return items[res.first];
 }
 
+// macOS/arm64 port: force external instantiation of the two used specializations so they
+// land in libpandabsp.dylib (the python module references them). # -- macOS port
+template PT(cubemap_t) AmbientProbeManager::find_closest_in_kdtree<PT(cubemap_t)>(
+        KDTree *, const LPoint3 &, const pvector<PT(cubemap_t)> &);
+template PT(ambientprobe_t) AmbientProbeManager::find_closest_in_kdtree<PT(ambientprobe_t)>(
+        KDTree *, const LPoint3 &, const pvector<PT(ambientprobe_t)> &);
+
 void AmbientProbeManager::cleanup()
 {
         MutexHolder holder( _cache_mutex );
