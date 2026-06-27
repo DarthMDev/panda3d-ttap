@@ -195,8 +195,21 @@ private:
 
 #else
 
-// If we don't have Cg, let's replace this with a stub.
+// macOS/arm64 port: without Cg there is no built-in shader generation, but we still
+// expose the constructor and virtual synthesize_shader so subclasses that generate their
+// own shaders (e.g. BSPShaderGenerator, which emits GLSL) can derive from it. # -- macOS port
+#include "shaderAttrib.h"
+class GraphicsStateGuardianBase;
+class RenderState;
+class GeomVertexAnimationSpec;
+
 class EXPCL_PANDA_PGRAPHNODES ShaderGenerator : public TypedReferenceCount {
+PUBLISHED:
+  ShaderGenerator(const GraphicsStateGuardianBase *gsg);
+  virtual ~ShaderGenerator();
+  virtual CPT(ShaderAttrib) synthesize_shader(const RenderState *rs,
+                                              const GeomVertexAnimationSpec &anim);
+
 public:
   static TypeHandle get_class_type() {
     return _type_handle;

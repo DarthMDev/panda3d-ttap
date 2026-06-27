@@ -1677,7 +1677,9 @@ INLINE colorrgbexp32_t *SampleLightData( pvector<colorrgbexp32_t> &data, const d
 	return &data[ofs + ( ( style * bump_count + bump ) * luxels ) + luxel];
 }
 
-INLINE colorrgbexp32_t *SampleLightmap( bspdata_t *data, const dface_t *face, int luxel, int style, int bump )
+// macOS/arm64 port: not INLINE — declared extern _BSPEXPORT in bspfile.h and called from
+// other TUs (lightmap_palettes.cpp), so it needs external linkage. # -- macOS port
+colorrgbexp32_t *SampleLightmap( bspdata_t *data, const dface_t *face, int luxel, int style, int bump )
 {
 	return SampleLightData( data->lightdata, face, face->lightofs, luxel, style, bump );
 }

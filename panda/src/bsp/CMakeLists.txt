@@ -126,22 +126,25 @@ target_include_directories(pandabsp PRIVATE
   "${CMAKE_CURRENT_SOURCE_DIR}/../bspinternal"
   ${PYTHON_INCLUDE_DIRS})  # py_panda.h -> Python.h, bspinternal headers # -- macOS port
 find_package(embree 4 QUIET)
-# macOS port: pandagl/pandabullet are MODULE (loadable) libs and can't be linked; the
-# bsp library is bundled into the panda3d.bsp python module which imports them at runtime.
-# # -- macOS port
-target_link_libraries(pandabsp panda pandaegg PKG::BULLET p3bspbase)
+# macOS port: pandagl/pandabullet are MODULE (loadable) libs and can't be linked; the bsp
+# library is bundled into the panda3d.bsp python module which imports them at runtime. The
+# static helpers (p3bspbase, embree, bullet) are linked PRIVATE so pandabsp stays cleanly
+# exportable (PUBLIC interface is only the already-exported panda/pandaegg). # -- macOS port
 if(embree_FOUND)
-  target_link_libraries(pandabsp embree)
+  set(_BSP_EMBREE embree)
 else()
   find_library(EMBREE_LIB NAMES embree4 embree HINTS /opt/homebrew/opt/embree/lib /usr/local/lib)
   target_include_directories(pandabsp PRIVATE /opt/homebrew/opt/embree/include)
-  target_link_libraries(pandabsp ${EMBREE_LIB})
+  set(_BSP_EMBREE ${EMBREE_LIB})
+endif()
+target_link_libraries(pandabsp PUBLIC panda pandaegg PRIVATE PKG::BULLET p3bspbase ${_BSP_EMBREE})
+# Python C-API and cross-module panda/interrogate symbols resolve at runtime when this is
+# loaded as the panda3d.bsp python module. # -- macOS port
+if(APPLE)
+  target_link_options(pandabsp PRIVATE -undefined dynamic_lookup)
 endif()
 target_interrogate(pandabsp ALL)
 
-# macOS port: pandabsp links the non-exported static p3bspbase, so it can't be part of an
-# export set; skip install/export here (it's bundled into the panda3d.bsp module). # -- macOS port
-if(BUILD_BSP_PYTHON_MODULE)
 install(TARGETS pandabsp
   EXPORT PandaBSP COMPONENT PandaBSP
   DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -151,4 +154,3 @@ install(TARGETS pandabsp
 install(FILES ${PANDABSP_HEADERS} COMPONENT PandaBSPDevel DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/panda3d)
 
 export_targets(PandaBSP COMPONENT PandaBSPDevel)
-endif()

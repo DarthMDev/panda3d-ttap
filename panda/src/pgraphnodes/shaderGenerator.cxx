@@ -2025,3 +2025,25 @@ operator == (const ShaderKey &other) const {
 }
 
 #endif  // HAVE_CG
+
+#ifndef HAVE_CG
+// macOS/arm64 port: minimal ShaderGenerator base so subclasses (BSPShaderGenerator) can
+// derive and override synthesize_shader without pulling in the Cg-only generator. # -- macOS port
+#include "graphicsStateGuardianBase.h"
+#include "renderState.h"
+#include "geomVertexAnimationSpec.h"
+
+ShaderGenerator::
+ShaderGenerator(const GraphicsStateGuardianBase *) {
+}
+
+ShaderGenerator::
+~ShaderGenerator() {
+}
+
+CPT(ShaderAttrib) ShaderGenerator::
+synthesize_shader(const RenderState *, const GeomVertexAnimationSpec &) {
+  // No built-in (Cg) shader generation in this build; subclasses override this.
+  return nullptr;
+}
+#endif  // !HAVE_CG

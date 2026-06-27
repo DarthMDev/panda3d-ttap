@@ -182,14 +182,19 @@ bdist_apps = direct.dist.commands:bdist_apps
   add_python_module(panda3d.fx pandafx IMPORT panda3d.core)
   add_python_module(panda3d.physics p3physics p3particlesystem LINK pandaphysics IMPORT panda3d.core)
 
-  # macOS port: the full BSP renderer (src/bsp -> pandabsp) is deferred (x86 SSE/Windows
-  # VHLT toolchain), but p3bspinternal (BSPMaterial/BSPMaterialAttrib/textureStages) is
-  # part of core and is needed by libpandadna, so still expose panda3d.bsp from just
-  # p3bspinternal. The full renderer auto-links once pandabsp is built. # -- macOS port
-  # macOS port: temporarily gated while the panda3d.bsp interrogate/import wiring is sorted
-  # out; the pandabsp library still builds from src/bsp. # -- macOS port
+  # macOS port: panda3d.bsp bundles p3bspinternal (BSPMaterial/etc.) + the pandabsp
+  # renderer. Gated behind BUILD_BSP_RENDERER (which builds pandabsp from src/bsp). NOTE:
+  # add_python_module's IMPORT keyword consumes only one arg, so repeat it per module
+  # (the original "IMPORT panda3d.core panda3d.bullet" leaked panda3d.bullet into the
+  # interrogate target list). # -- macOS port
+  # The panda3d.bsp PYTHON MODULE (separate gate): the renderer LIBRARY builds with
+  # BUILD_BSP_RENDERER, but generating its Python bindings still needs interrogate
+  # type-resolution work for panda's macro-heavy math headers (LVector4 etc.). # -- macOS port
   if(BUILD_BSP_PYTHON_MODULE AND TARGET pandabsp AND TARGET p3bspinternal)
-    add_python_module(panda3d.bsp p3bspinternal pandabsp IMPORT panda3d.core panda3d.bullet) # -- lachbr
+    # LINK pandabsp so the module links the (exported) pandabsp lib rather than the raw
+    # p3bspinternal component; p3bspinternal is still interrogated, and its BSPMaterial
+    # symbols come from libpanda (panda3d.core) at runtime. # -- macOS port
+    add_python_module(panda3d.bsp p3bspinternal pandabsp LINK pandabsp IMPORT panda3d.core IMPORT panda3d.bullet) # -- lachbr
   endif()
 
   if(HAVE_ODE)

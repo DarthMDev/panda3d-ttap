@@ -14,6 +14,16 @@
 
 #include <dconfig.h>
 #include <renderAttrib.h>
+#include <vector_string.h>  // vector_string used below # -- macOS port
+
+// macOS/arm64 port: EXPORT_CLASS/IMPORT_CLASS are Windows dllexport macros injected by the
+// old MSVC build; define them empty on non-Windows (default dylib visibility). # -- macOS port
+#if !defined(_WIN32) && !defined(EXPORT_CLASS)
+#define EXPORT_CLASS
+#define EXPORT_TEMPL
+#define IMPORT_CLASS
+#define IMPORT_TEMPL
+#endif
 
 #ifdef BUILDING_LIBPANDABSP
 #define EXPCL_PANDABSP EXPORT_CLASS
@@ -23,9 +33,13 @@
 #define EXPTP_PANDABSP IMPORT_TEMPL
 #endif
 
+#ifndef CPPPARSER  // macOS port: hide vector_string return from interrogate # -- macOS port
 extern EXPCL_PANDABSP vector_string parse_cmd( const std::string &cmd );
+#endif
 
+#ifndef CPPPARSER  // macOS port: config registration doesn't need interrogate # -- macOS port
 ConfigureDecl( config_bsp, EXPCL_PANDABSP, EXPTP_PANDABSP );
+#endif
 
 #define DECLARE_CLASS2(classname, parentname1, parentname2)\
 private:\

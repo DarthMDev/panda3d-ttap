@@ -1,4 +1,8 @@
 
+// macOS/arm64 port: include cmdlib.h first so SYSTEM_POSIX is defined before the platform
+// #ifdefs below; otherwise the POSIX Alloc/Free block is skipped entirely. # -- macOS port
+#include "cmdlib.h"
+
 /// ********* WIN32 **********
 
 #ifdef _WIN32
