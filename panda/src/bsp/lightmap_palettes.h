@@ -16,6 +16,7 @@
 #include <pvector.h>
 #include <notifyCategoryProxy.h>
 #include <aa_luse.h>
+#include <texture.h>  // PT(Texture) # -- macOS port
 
 #include "TexturePacker.h"
 #include "mathlib.h"

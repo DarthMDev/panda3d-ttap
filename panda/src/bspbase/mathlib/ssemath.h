@@ -9,7 +9,14 @@
 #include <aa_luse.h>
 #include <plane.h>
 
+// macOS/arm64 port: map x86 SSE intrinsics to ARM NEON via the vendored sse2neon
+// shim; use the native header on x86. # -- macOS port
+#if defined(__aarch64__) || defined(__arm64__)
+#define SSE2NEON_SUPPRESS_WARNINGS
+#include "sse2neon.h"
+#else
 #include <xmmintrin.h>
+#endif
 
 #include "common_config.h"
 
@@ -1840,7 +1847,7 @@ FORCEINLINE uint32_t SubInt( const fltx4 & a, int idx )
 #ifndef POSIX
         return a.m128_u32[idx];
 #else
-        return ( reinterpret_cast<uint32 const *>( &a ) )[idx];
+        return ( reinterpret_cast<uint32_t const *>( &a ) )[idx];
 #endif
 }
 
@@ -1849,7 +1856,7 @@ FORCEINLINE uint32_t & SubInt( fltx4 & a, int idx )
 #ifndef POSIX
         return a.m128_u32[idx];
 #else
-        return ( reinterpret_cast<uint32 *>( &a ) )[idx];
+        return ( reinterpret_cast<uint32_t *>( &a ) )[idx];
 #endif
 }
 

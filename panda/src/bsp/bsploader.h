@@ -13,7 +13,7 @@
 #define BSPLOADER_H
 
 #include "config_bsp.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
 
 #include <filename.h>
 #include <lvector3.h>

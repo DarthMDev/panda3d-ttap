@@ -6,7 +6,16 @@
 
 #include <math.h>
 #include <float.h>	// Needed for FLT_EPSILON
+// macOS/arm64 port: <memory.h> is legacy; use <string.h>. Map x86 SSE intrinsics to NEON
+// via the vendored sse2neon shim on arm64. # -- macOS port
+#if defined(__aarch64__) || defined(__arm64__)
+#include <string.h>
+#define SSE2NEON_SUPPRESS_WARNINGS
+#include "sse2neon.h"
+#else
 #include <memory.h>
+#include <xmmintrin.h>
+#endif
 #include "mathlib.h"
 #include "sse.h"
 

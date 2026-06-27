@@ -114,9 +114,34 @@ set(PANDABSP_SOURCES
 composite_sources(pandabsp PANDABSP_SOURCES)
 add_library(pandabsp ${PANDABSP_SOURCES} ${PANDABSP_HEADERS})
 set_target_properties(pandabsp PROPERTIES DEFINE_SYMBOL BUILDING_LIBPANDABSP)
-target_link_libraries(pandabsp panda pandaegg pandabullet pandagl PKG::BULLET)
+
+# macOS port: the renderer uses bspbase (bspfile/mathlib/winding) and embree, which the
+# original makepanda build linked implicitly. Wire them explicitly here. # -- macOS port
+target_include_directories(pandabsp PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/../bspbase"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../bspbase/mathlib"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../bullet"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../glgsg"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../glstuff"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../bspinternal"
+  ${PYTHON_INCLUDE_DIRS})  # py_panda.h -> Python.h, bspinternal headers # -- macOS port
+find_package(embree 4 QUIET)
+# macOS port: pandagl/pandabullet are MODULE (loadable) libs and can't be linked; the
+# bsp library is bundled into the panda3d.bsp python module which imports them at runtime.
+# # -- macOS port
+target_link_libraries(pandabsp panda pandaegg PKG::BULLET p3bspbase)
+if(embree_FOUND)
+  target_link_libraries(pandabsp embree)
+else()
+  find_library(EMBREE_LIB NAMES embree4 embree HINTS /opt/homebrew/opt/embree/lib /usr/local/lib)
+  target_include_directories(pandabsp PRIVATE /opt/homebrew/opt/embree/include)
+  target_link_libraries(pandabsp ${EMBREE_LIB})
+endif()
 target_interrogate(pandabsp ALL)
 
+# macOS port: pandabsp links the non-exported static p3bspbase, so it can't be part of an
+# export set; skip install/export here (it's bundled into the panda3d.bsp module). # -- macOS port
+if(BUILD_BSP_PYTHON_MODULE)
 install(TARGETS pandabsp
   EXPORT PandaBSP COMPONENT PandaBSP
   DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -126,3 +151,4 @@ install(TARGETS pandabsp
 install(FILES ${PANDABSP_HEADERS} COMPONENT PandaBSPDevel DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/panda3d)
 
 export_targets(PandaBSP COMPONENT PandaBSPDevel)
+endif()

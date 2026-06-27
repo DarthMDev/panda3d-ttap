@@ -14,7 +14,9 @@
 #include "bsp_render.h"
 #include "bspfile.h"
 #include "mathlib.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
+#include "bspMaterialAttrib.h"
+#include "textureStages.h"  // # -- macOS port
 #include "cubemaps.h"
 #include "shader_generator.h"
 #include "bsptools.h"
@@ -30,7 +32,7 @@
 #include <eggData.h>
 #include <eggPolygon.h>
 #include <eggVertexUV.h>
-#include <eggWriter.h>
+// #include <eggWriter.h>  // # -- macOS port: unused, pandatool-only header
 #include <geomNode.h>
 #include <load_egg_file.h>
 #include <loader.h>

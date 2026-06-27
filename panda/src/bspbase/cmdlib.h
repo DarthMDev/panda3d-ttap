@@ -1,6 +1,13 @@
 #ifndef CMDLIB_H__
 #define CMDLIB_H__
 
+// macOS/arm64 port: this VHLT code branches on _WIN32 vs SYSTEM_POSIX, but SYSTEM_POSIX
+// was only ever passed by the old Linux build. Auto-enable it on any non-Windows host so
+// the POSIX code paths (INLINE/STDCALL, strdup aliases, etc.) activate. # -- macOS port
+#if !defined(_WIN32) && !defined(SYSTEM_POSIX)
+#define SYSTEM_POSIX
+#endif
+
 #pragma warning(disable: 4251)
 
 #include "common_config.h"
@@ -54,6 +61,9 @@ using std::endl;
 #endif
 #ifdef VERSION_OTHER
 #define PLATFORM_VERSIONSTRING "???"
+// macOS/arm64 port: like the 64-bit/Linux builds, we can compute face extents directly
+// (avoids the .ext-file path that needs the undefined g_numfaces). # -- macOS port
+#define PLATFORM_CAN_CALC_EXTENT
 #endif
 
 //=====================================================================

@@ -11,7 +11,9 @@
 
 #include "shader_generator.h"
 #include "pssmCameraRig.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
+#include "bspMaterialAttrib.h"  // # -- macOS port
+#include "textureStages.h"  // # -- macOS port
 #include "ambient_probes.h"
 #include "cubemaps.h"
 #include "aux_data_attrib.h"

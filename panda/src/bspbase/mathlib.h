@@ -17,7 +17,15 @@
 
 #include <aa_luse.h>
 
+// macOS/arm64 port: 16-byte alignment macros. MSVC uses the __declspec prefix; clang/gcc
+// use the __attribute__ postfix. # -- macOS port
+#if defined(_MSC_VER)
+#define ALIGN16 __declspec(align(16))
 #define ALIGN16_POST
+#else
+#define ALIGN16
+#define ALIGN16_POST __attribute__((aligned(16)))
+#endif
 
 #define YAW	0
 #define PITCH	1

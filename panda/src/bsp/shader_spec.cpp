@@ -11,7 +11,7 @@
 
 #include "shader_spec.h"
 #include "shader_generator.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
 #include "bsploader.h"
 #include "static_props.h"
 #include "bloom_attrib.h"

@@ -10,7 +10,7 @@
  */
 
 #include "shader_features.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
 #include "keyvalues.h"
 #include "shader_spec.h"
 

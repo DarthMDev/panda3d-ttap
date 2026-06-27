@@ -12,8 +12,9 @@
 #include "shader_lightmappedgeneric.h"
 #include "bsploader.h"
 #include "shader_generator.h"
+#include "textureStages.h"  // # -- macOS port
 #include "planar_reflections.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
 
 #include <lightRampAttrib.h>
 #include <textureStage.h>

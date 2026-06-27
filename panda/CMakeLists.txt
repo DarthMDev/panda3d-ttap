@@ -5,10 +5,7 @@ endif()
 # Include panda source directories
 add_subdirectory(src/audio)
 add_subdirectory(src/audiotraits)
-# macOS port: src/bspbase is the x86/Windows VHLT BSP toolchain (SSE intrinsics,
-# malloc.h, __declspec) and is not linked by core panda (only by the deferred pandabsp
-# renderer), so skip it here until the BSP subsystem is ported to arm64. # -- macOS port
-#add_subdirectory(src/bspbase) # -- lachbr
+add_subdirectory(src/bspbase) # -- lachbr
 add_subdirectory(src/bspinternal) # -- lachbr
 add_subdirectory(src/chan)
 add_subdirectory(src/char)
@@ -85,6 +82,14 @@ add_subdirectory(metalibs/pandagl)
 add_subdirectory(metalibs/pandagles)
 add_subdirectory(metalibs/pandagles2)
 add_subdirectory(metalibs/pandaphysics)
+
+# macOS port: BSP renderer (src/bsp builds the `pandabsp` library directly). NOTE:
+# metalibs/pandabsp is a stale duplicate of the core `panda` metalib (it calls
+# add_metalib(panda ...)) and must NOT be added. Gated behind BUILD_BSP_RENDERER while the
+# renderer's Cg-coupled ShaderGenerator dependency is worked out. # -- macOS port
+if(BUILD_BSP_RENDERER)
+  add_subdirectory(src/bsp)
+endif()
 
 # Now add the Python modules:
 set(CORE_MODULE_COMPONENTS
@@ -177,10 +182,13 @@ bdist_apps = direct.dist.commands:bdist_apps
   add_python_module(panda3d.fx pandafx IMPORT panda3d.core)
   add_python_module(panda3d.physics p3physics p3particlesystem LINK pandaphysics IMPORT panda3d.core)
 
-  # macOS port: the BSP subsystem (src/bsp + metalibs/pandabsp) is not yet wired into
-  # this build; guard the python module so the core engine configures without it and it
-  # activates automatically once the bsp targets are added. # -- macOS port
-  if(TARGET pandabsp AND TARGET p3bspinternal)
+  # macOS port: the full BSP renderer (src/bsp -> pandabsp) is deferred (x86 SSE/Windows
+  # VHLT toolchain), but p3bspinternal (BSPMaterial/BSPMaterialAttrib/textureStages) is
+  # part of core and is needed by libpandadna, so still expose panda3d.bsp from just
+  # p3bspinternal. The full renderer auto-links once pandabsp is built. # -- macOS port
+  # macOS port: temporarily gated while the panda3d.bsp interrogate/import wiring is sorted
+  # out; the pandabsp library still builds from src/bsp. # -- macOS port
+  if(BUILD_BSP_PYTHON_MODULE AND TARGET pandabsp AND TARGET p3bspinternal)
     add_python_module(panda3d.bsp p3bspinternal pandabsp IMPORT panda3d.core panda3d.bullet) # -- lachbr
   endif()
 

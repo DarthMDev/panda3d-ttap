@@ -10,6 +10,7 @@
  */
 
 #include "bsp_render.h"
+#include "bspMaterialAttrib.h"  // # -- macOS port
 #include "bsploader.h"
 
 #include <depthOffsetAttrib.h>

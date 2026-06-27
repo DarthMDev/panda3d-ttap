@@ -10,6 +10,7 @@
  */
 
 #include "shader_vertexlitgeneric.h"
+#include "textureStages.h"  // # -- macOS port
 
 #include <auxBitplaneAttrib.h>
 #include <transparencyAttrib.h>
@@ -28,7 +29,7 @@
 
 #include "bsploader.h"
 #include "pssmCameraRig.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
 #include "shader_generator.h"
 #include "postprocess/postprocess_defines.h"
 

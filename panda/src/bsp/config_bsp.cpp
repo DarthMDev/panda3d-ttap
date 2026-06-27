@@ -18,7 +18,8 @@
 #include "bsploader.h"
 #include "bsp_render.h"
 #include "shader_generator.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
+#include "bspMaterialAttrib.h"  // # -- macOS port
 #include "shader_spec.h"
 #include "aux_data_attrib.h"
 #include "bounding_kdop.h"

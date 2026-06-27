@@ -2,7 +2,7 @@
 
 #include <geomVertexReader.h>
 
-#include <embree3/rtcore.h>
+#include <embree4/rtcore.h>  // # -- macOS port: was embree3; intersect-context API changed in v4
 
 NotifyCategoryDef( raytrace, "" );
 
@@ -264,9 +264,10 @@ RayTraceHitResult RayTraceScene::trace_ray( const LPoint3 &start, const LVector3
         //nassertr( RayTrace::get_device() != nullptr, result );
         //nassertr( _scene != nullptr, result );
 
-        RTCIntersectContext ctx;
-        rtcInitIntersectContext( &ctx );
-        ctx.flags = RTC_INTERSECT_CONTEXT_FLAG_COHERENT;
+        // embree4: intersect contexts replaced by RTCIntersectArguments. # -- macOS port
+        RTCIntersectArguments args;
+        rtcInitIntersectArguments( &args );
+        args.flags = RTC_RAY_QUERY_FLAG_COHERENT;
 
         ALIGN_16BYTE RTCRay ray;
         ray.mask = mask.get_word();
@@ -288,7 +289,7 @@ RayTraceHitResult RayTraceScene::trace_ray( const LPoint3 &start, const LVector3
         //        << "Tracing ray from " << start << ", direction " << dir << ", distance " << distance << ", mask " << mask << std::endl;
 
         // Trace a ray
-        rtcIntersect1( _scene, &ctx, &rhit );
+        rtcIntersect1( _scene, &rhit, &args );  // # -- macOS port: embree4 signature
 
         //RTCError err = rtcGetDeviceError( RayTrace::get_device() );
         //raytrace_cat.debug()
@@ -323,9 +324,10 @@ void RayTraceScene::trace_four_rays( const FourVectors &start, const FourVectors
         const fltx4 &distance, const u32x4 &mask, RayTraceHitResult4 *res )
 {
 
-        RTCIntersectContext ctx;
-        rtcInitIntersectContext( &ctx ); 
-        //ctx.flags = RTC_INTERSECT_CONTEXT_FLAG_COHERENT;
+        // embree4: intersect contexts replaced by RTCIntersectArguments. # -- macOS port
+        RTCIntersectArguments args;
+        rtcInitIntersectArguments( &args );
+        //args.flags = RTC_RAY_QUERY_FLAG_COHERENT;
 
         ALIGN_16BYTE RTCRayHit4 rhit4;
         StoreAlignedUIntSIMD( rhit4.hit.geomID, Four_NegativeOnes );
@@ -341,7 +343,7 @@ void RayTraceScene::trace_four_rays( const FourVectors &start, const FourVectors
         StoreAlignedSIMD( rhit4.ray.tfar, distance );
         StoreAlignedUIntSIMD( rhit4.ray.flags, Four_Zeros );
         
-        rtcIntersect4( Four_NegativeOnes_NonSIMD, _scene, &ctx, &rhit4 );
+        rtcIntersect4( Four_NegativeOnes_NonSIMD, _scene, &rhit4, &args );  // # -- macOS port: embree4 signature
 
         res->geom_id = LoadAlignedIntSIMD( rhit4.hit.geomID );
 

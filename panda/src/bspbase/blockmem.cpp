@@ -4,7 +4,11 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#if defined(_WIN32)
 #include <malloc.h>
+#else
+#include <stdlib.h>   // macOS has no <malloc.h> # -- macOS port
+#endif
 #include "cmdlib.h"
 #include "messages.h"
 #include "log.h"

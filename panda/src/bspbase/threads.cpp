@@ -1,7 +1,11 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#if defined(_WIN32)
 #include <malloc.h>
+#else
+#include <stdlib.h>   // macOS has no <malloc.h> # -- macOS port
+#endif
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -505,25 +509,25 @@ void            RunThreadsOn( int workcnt, bool showpacifier, q_threadfunction f
 
 int             g_numthreads = DEFAULT_NUMTHREADS;
 
-void            ThreadSetPriority( q_threadpriority type )
+void            ThreadSetPriority( ThreadPriority type )  // # -- macOS port: was q_threadpriority
 {
         int             val;
 
         g_threadpriority = type;
 
         // Currently in Linux land users are incapable of raising the priority level of their processes
-        // Unless you are root -high is useless . . . 
+        // Unless you are root -high is useless . . .
         switch ( g_threadpriority )
         {
-        case eThreadPriorityLow:
+        case TP_low:        // # -- macOS port: Panda ThreadPriority (was eThreadPriority*)
                 val = PRIO_MAX;
                 break;
 
-        case eThreadPriorityHigh:
+        case TP_high:
                 val = PRIO_MIN;
                 break;
 
-        case eThreadPriorityNormal:
+        case TP_normal:
         default:
                 val = 0;
                 break;
@@ -558,7 +562,7 @@ void            ThreadUnlock()
         }
 }
 
-q_threadfunction q_entry;
+q_threadfunction *q_entry;  // # -- macOS port: pointer (was a function declaration)
 
 static void*    CDECL ThreadEntryStub( void* pParam )
 {

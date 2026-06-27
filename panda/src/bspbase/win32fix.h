@@ -6,7 +6,12 @@
 #pragma once
 #endif
 
+#ifdef _WIN32
 #include <malloc.h>
+#else
+#include <stdlib.h>   // malloc/free; macOS has no <malloc.h> # -- macOS port
+#include <alloca.h>
+#endif
 
 /////////////////////////////
 #ifdef _WIN32
@@ -48,6 +53,17 @@
 
 /////////////////////////////
 #ifdef SYSTEM_POSIX
+// macOS/arm64 port: POSIX system headers the original Linux build pulled in implicitly,
+// plus a `finite` shim (removed from C++ <cmath>; use isfinite). # -- macOS port
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <strings.h>
+#include <math.h>
+#ifndef finite
+#define finite(x) isfinite(x)
+#endif
+
 #define _MAX_PATH  4096
 #define _MAX_DRIVE 4096
 #define _MAX_DIR   4096

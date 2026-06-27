@@ -15,7 +15,12 @@
 #include "decals.h"
 #include "bsp_trace.h"
 #include "bsploader.h"
-#include "bsp_material.h"
+#include "bspMaterial.h"
+#include "bspMaterialAttrib.h"
+#include "textureStages.h"
+#ifndef ARRAYSIZE
+#define ARRAYSIZE(a) (sizeof(a)/sizeof((a)[0]))  // # -- macOS port
+#endif
 #include "shader_generator.h"
 #include "bsp_render.h"
 #include "mathlib.h"
