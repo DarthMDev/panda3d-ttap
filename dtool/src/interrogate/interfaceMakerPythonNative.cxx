@@ -6567,7 +6567,11 @@ write_make_seq(ostream &out, Object *obj, const std::string &ClassName,
     "\n";
 
   if ((elem_getter->_args_type & AT_varargs) == AT_varargs) {
-    out << "  _Py_ForgetReference((PyObject *)&args);\n";
+    // _Py_ForgetReference is only available in Py_TRACE_REFS (debug) builds of
+    // Python 3.9+; guard it so release builds compile. # -- macOS port
+    out << "#ifdef Py_TRACE_REFS\n"
+           "  _Py_ForgetReference((PyObject *)&args);\n"
+           "#endif\n";
   }
 
   out <<

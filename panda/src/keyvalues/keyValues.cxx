@@ -453,13 +453,13 @@ LVecBase4f CKeyValues::to_4f(const std::string &str) {
 }
 
 template<class T>
-static std::string CKeyValues::to_string(T v) {
+std::string CKeyValues::to_string(T v) {
 	return std::to_string(v);
 }
 
 template<class T>
-static std::string CKeyValues::to_string(const pvector<T> &v) {
-	string res = "[ ";
+std::string CKeyValues::to_string(const pvector<T> &v) {
+	std::string res = "[ ";
 	for (size_t i = 0; i < v.size(); i++) {
 		res += to_string(v[i]);
 	}

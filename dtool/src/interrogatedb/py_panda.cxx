@@ -527,16 +527,22 @@ PyObject *Dtool_PyModuleInitHelper(const LibraryDef *defs[], PyModuleDef *module
 PyObject *Dtool_PyModuleInitHelper(const LibraryDef *defs[], const char *modulename) {
 #endif
   // Check the version so we can print a helpful error if it doesn't match.
+  // Parse the runtime "MAJOR.MINOR" allowing a multi-digit minor (e.g. Python
+  // 3.10+); the old single-char check read only version[2] and rejected 3.10.
+  // # -- macOS port
   string version = Py_GetVersion();
+  int runtime_major = atoi(version.c_str());
+  size_t dot = version.find('.');
+  int runtime_minor = (dot != string::npos) ? atoi(version.c_str() + dot + 1) : -1;
 
-  if (version[0] != '0' + PY_MAJOR_VERSION ||
-      version[2] != '0' + PY_MINOR_VERSION) {
+  if (runtime_major != PY_MAJOR_VERSION ||
+      runtime_minor != PY_MINOR_VERSION) {
     // Raise a helpful error message.  We can safely do this because the
     // signature and behavior for PyErr_SetString has remained consistent.
     std::ostringstream errs;
     errs << "this module was compiled for Python "
          << PY_MAJOR_VERSION << "." << PY_MINOR_VERSION << ", which is "
-         << "incompatible with Python " << version.substr(0, 3);
+         << "incompatible with Python " << runtime_major << "." << runtime_minor;
     string error = errs.str();
     PyErr_SetString(PyExc_ImportError, error.c_str());
     return nullptr;
