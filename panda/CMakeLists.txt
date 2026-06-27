@@ -195,6 +195,8 @@ bdist_apps = direct.dist.commands:bdist_apps
     # p3bspinternal component; p3bspinternal is still interrogated, and its BSPMaterial
     # symbols come from libpanda (panda3d.core) at runtime. # -- macOS port
     list(APPEND IGATE_FLAGS "-noangles")
+    # The game imports `libpandabsp` (top-level); we build the module as panda3d.bsp and
+    # ship a small libpandabsp.py shim (re-exports panda3d.bsp). # -- macOS port
     add_python_module(panda3d.bsp p3bspinternal pandabsp LINK pandabsp IMPORT panda3d.core IMPORT panda3d.bullet) # -- lachbr
     if(APPLE)
       target_link_options(panda3d.bsp PRIVATE -undefined dynamic_lookup)
