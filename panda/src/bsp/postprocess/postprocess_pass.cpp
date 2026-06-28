@@ -92,6 +92,8 @@ LVector2i PostProcessPass::get_corrected_size( const LVector2i &size )
 void PostProcessPass::add_color_output()
 {
 	nassertv( _buffer != nullptr );
+	if ( !_buffer )
+		return;
 	if ( !_color_texture )
 	{
 		_color_texture = make_texture( Texture::F_srgb, "color" );
@@ -149,14 +151,6 @@ bool PostProcessPass::setup_buffer()
 		flags |= GraphicsPipe::BF_resizeable;
 	}
 
-	std::cout << "Setup buffer " << get_name() << std::endl;
-	fbprops.output( std::cout );
-	std::cout << std::endl;
-	winprops.output( std::cout );
-	std::cout << std::endl;
-	std::cout << "Flags: " << flags << std::endl;
-
-	std::cout.flush();
 	PT( GraphicsOutput ) output = window->get_engine()->make_output(
 		window->get_pipe(), get_name(), -1,
 		fbprops, winprops, flags, window->get_gsg(),
@@ -165,7 +159,7 @@ bool PostProcessPass::setup_buffer()
 	// fail gracefully instead of null-dereferencing below. # -- macOS port
 	if ( output == nullptr )
 	{
-		std::cout << "PostProcess: make_output failed for buffer " << get_name() << std::endl;
+		std::cerr << "PostProcess: make_output FAILED for buffer " << get_name() << std::endl;
 		return false;
 	}
 
@@ -215,7 +209,13 @@ void PostProcessPass::setup_region()
 
 void PostProcessPass::setup()
 {
-	nassertv( setup_buffer() );
+	// macOS port: call setup_buffer() OUTSIDE nassertv — in this build nassertv() does not
+	// evaluate its argument, so the buffer was never created (left null -> later crash).
+	// # -- macOS port
+	bool buffer_ok = setup_buffer();
+	nassertv( buffer_ok );
+	if ( !buffer_ok )
+		return;
 	setup_quad();
 	setup_camera();
 	setup_region();
