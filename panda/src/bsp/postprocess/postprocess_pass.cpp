@@ -156,11 +156,18 @@ bool PostProcessPass::setup_buffer()
 	std::cout << std::endl;
 	std::cout << "Flags: " << flags << std::endl;
 
+	std::cout.flush();
 	PT( GraphicsOutput ) output = window->get_engine()->make_output(
 		window->get_pipe(), get_name(), -1,
 		fbprops, winprops, flags, window->get_gsg(),
 		window );
-	nassertr( output != nullptr, false );
+	// macOS port: make_output can return null if the requested FBO config is unsupported;
+	// fail gracefully instead of null-dereferencing below. # -- macOS port
+	if ( output == nullptr )
+	{
+		std::cout << "PostProcess: make_output failed for buffer " << get_name() << std::endl;
+		return false;
+	}
 
 	_buffer = DCAST( GraphicsBuffer, output );
 	_buffer->set_sort( _pp->next_sort() );
