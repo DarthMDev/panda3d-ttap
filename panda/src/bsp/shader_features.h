@@ -106,7 +106,12 @@ public:
                 ShaderFeature(),
                 arme_texture( nullptr ),
                 ao( 1.0 ),
-                roughness( 0.0 ),
+                // macOS port: default to fully rough/matte. roughness 0 is a
+                // mirror, and the GGX distribution term has a 1/(PI*alpha^2)
+                // singularity at the reflection point -> infinitely bright
+                // pinpoint specular = white speckles on every material that
+                // doesn't supply ARME/$roughness (most toon + prop geometry).
+                roughness( 1.0 ),
                 metallic( 0.0 ),
                 emissive( 0.0 )
         {
