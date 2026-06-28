@@ -252,6 +252,7 @@ void ShaderSpec::add_hw_skinning( const GeomVertexAnimationSpec &anim, ShaderPer
 }
 
 #include <alphaTestAttrib.h>
+#include <transparencyAttrib.h>
 
 bool ShaderSpec::add_alpha_test( const RenderState *rs, ShaderPermutations &perms )
 {
@@ -265,6 +266,23 @@ bool ShaderSpec::add_alpha_test( const RenderState *rs, ShaderPermutations &perm
 		perms.add_permutation( "ALPHA_TEST_REF", alpha_test->get_reference_alpha() );
 
 		perms.add_flag( ShaderAttrib::F_subsume_alpha_test );
+
+		return true;
+	}
+
+	// macOS port: M_binary / M_dual transparency relies on an alpha test to
+	// discard transparent texels. The fixed-function alpha test is gone in GL
+	// core profiles (all macOS has), and without it the cutout (opaque) pass
+	// writes the whole quad opaque -> alpha-cutout geometry (foliage, decals,
+	// drop shadows) renders as white squares. Emit a shader-side alpha test
+	// when there's no explicit AlphaTestAttrib to cover it. // -- macOS port
+	const TransparencyAttrib *transp;
+	rs->get_attrib_def( transp );
+	if ( transp->get_mode() == TransparencyAttrib::M_binary ||
+		transp->get_mode() == TransparencyAttrib::M_dual )
+	{
+		perms.add_permutation( "ALPHA_TEST", RenderAttrib::M_greater_equal );
+		perms.add_permutation( "ALPHA_TEST_REF", 0.5 );
 
 		return true;
 	}
