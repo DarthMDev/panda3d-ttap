@@ -206,7 +206,11 @@ class AstronInternalRepository(ConnectionRepository):
         dg2 = PyDatagram()
         dg2.addServerControlHeader(CONTROL_ADD_POST_REMOVE)
         dg2.addUint64(self.ourChannel)
-        dg2.addString(dg.getMessage())
+        # macOS/py3 port: addString() rejects bytes in this build's bindings; replicate its
+        # uint16-length-prefixed format with the raw message bytes. # -- macOS port
+        msg = dg.getMessage()
+        dg2.addUint16(len(msg))
+        dg2.appendData(msg)
         self.send(dg2)
 
     def clearPostRemove(self):
