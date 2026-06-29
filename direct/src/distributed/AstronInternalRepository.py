@@ -287,7 +287,17 @@ class AstronInternalRepository(ConnectionRepository):
 
         dclass = self.dclassesByNumber[classId]
 
-        do = dclass.getClassDef()(self)
+        try:
+            do = dclass.getClassDef()(self)
+        except TypeError as e:
+            # The generic object-entry reconstruction can only pass 'air' to the
+            # constructor. An AI DistributedObject whose __init__ requires extra
+            # positional args raises TypeError here; skip it with a warning rather
+            # than letting the exception kill the reader task (and the whole AI).
+            self.notify.warning(
+                'Cannot reconstruct %s from object entry (doId %d): %s' %
+                (dclass.getName(), doId, e))
+            return
         do.dclass = dclass
         do.doId = doId
         # The DO came in off the server, so we do not unregister the channel when
