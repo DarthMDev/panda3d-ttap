@@ -3540,16 +3540,24 @@ make_shadow_buffer(LightLensNode *light, Texture *tex, GraphicsOutput *host) {
  */
 void GraphicsStateGuardian::
 ensure_generated_shader(const RenderState *state) {
-#ifdef HAVE_CG
   const ShaderAttrib *shader_attrib;
   state->get_attrib_def(shader_attrib);
 
   if (shader_attrib->auto_shader()) {
     if (_shader_generator == nullptr) {
+      // macOS port: only the built-in fallback ShaderGenerator needs Cg/basic
+      // shaders. When a shader generator has already been installed (e.g. the
+      // GLSL BSPShaderGenerator), use it -- otherwise shader-auto geometry on
+      // GL core profiles (no Cg) never gets a generated shader and renders
+      // without its material's textures. // -- macOS port
+#ifdef HAVE_CG
       if (!_supports_basic_shaders) {
         return;
       }
       _shader_generator = new ShaderGenerator(this);
+#else
+      return;
+#endif
     }
     if (state->_generated_shader == nullptr ||
         state->_generated_shader_seq != _generated_shader_seq) {
@@ -3568,7 +3576,6 @@ ensure_generated_shader(const RenderState *state) {
       state->_generated_shader_seq = _generated_shader_seq;
     }
   }
-#endif
 }
 
 /**
