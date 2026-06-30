@@ -287,30 +287,34 @@ class AstronInternalRepository(ConnectionRepository):
 
         dclass = self.dclassesByNumber[classId]
 
+        # The generic object-entry reconstruction can only pass 'air' to the
+        # constructor and then replay the required fields. AI DistributedObject
+        # subclasses that take extra constructor args, or whose Python-3 field
+        # handlers don't match the dclass signature, raise here. Wrap the whole
+        # reconstruction so one unported class skips with a warning instead of
+        # killing the reader task (and the entire AI server).  # -- macOS port
+        do = None
         try:
             do = dclass.getClassDef()(self)
-        except TypeError as e:
-            # The generic object-entry reconstruction can only pass 'air' to the
-            # constructor. An AI DistributedObject whose __init__ requires extra
-            # positional args raises TypeError here; skip it with a warning rather
-            # than letting the exception kill the reader task (and the whole AI).
+            do.dclass = dclass
+            do.doId = doId
+            # The DO came in off the server, so we do not unregister the channel
+            # when it dies:
+            do.doNotDeallocateChannel = True
+            self.addDOToTables(do, location=(parentId, zoneId))
+
+            # Now for generation:
+            do.generate()
+            if other:
+                do.updateAllRequiredOtherFields(dclass, di)
+            else:
+                do.updateAllRequiredFields(dclass, di)
+        except Exception as e:
             self.notify.warning(
                 'Cannot reconstruct %s from object entry (doId %d): %s' %
                 (dclass.getName(), doId, e))
+            self.doId2do.pop(doId, None)
             return
-        do.dclass = dclass
-        do.doId = doId
-        # The DO came in off the server, so we do not unregister the channel when
-        # it dies:
-        do.doNotDeallocateChannel = True
-        self.addDOToTables(do, location=(parentId, zoneId))
-
-        # Now for generation:
-        do.generate()
-        if other:
-            do.updateAllRequiredOtherFields(dclass, di)
-        else:
-            do.updateAllRequiredFields(dclass, di)
 
     def handleObjExit(self, di):
         doId = di.getUint32()
